@@ -16,3 +16,13 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         return self.server.servletContainer.handleRequest(HTTPRequest(self), HTTPResponse(self))
+
+    def log_message(self, format, *args):
+        pass
+
+    def log_request(self, code='-', size='-'):
+        self.log_message('"%s" %s %s',
+                         self.requestline, str(code), str(size))
+
+    def log_error(self, format, *args):
+        self.log_message(format, *args)

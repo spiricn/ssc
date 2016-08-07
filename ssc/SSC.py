@@ -1,12 +1,13 @@
 import argparse
+import logging
 
 from ssc.HTTPServer import HTTPServer
-from ssc.Logger import Logger
 
 
 def programMain():
     # Initialize logging
-    Logger.initLogging()
+    logging.basicConfig(level=logging.DEBUG,
+            format='%(levelname)s/%(name)s: %(message)s')
 
     parser = argparse.ArgumentParser()
 

@@ -1,18 +1,18 @@
+import logging
 import socket
 from socketserver import TCPServer
 
 from ssc.HTTPRequestHandler import HTTPRequestHandler
-from ssc.Logger import Logger
 from ssc.ServletContainer import ServletContainer
 
+
+logger = logging.getLogger(__name__)
 
 class HTTPServer(TCPServer):
     def __init__(self, rootDir, port):
         self._servletContainer = ServletContainer(self, rootDir)
 
         TCPServer.__init__(self, ("", port), HTTPRequestHandler)
-
-        self._log = Logger(self)
 
     @property
     def servletContainer(self):
@@ -23,6 +23,6 @@ class HTTPServer(TCPServer):
         self.socket.bind(self.server_address)
 
     def start(self):
-        self._log.d('Server running')
+        logger.debug('Server running')
 
         self.serve_forever()

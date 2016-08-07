@@ -3,7 +3,7 @@ manifest = {
         {'file' : 'Index.html', 'pattern' : '^.$'},
     ],
 
-    'default_page' : 'Index.html',
+    'home_page' : 'Index.html',
 
     '404_page' : 'Index.html'
 }

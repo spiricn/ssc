@@ -1,9 +1,11 @@
+import logging
 import os
 
-from ssc.Logger import Logger
 from ssc.ManifestManager import ManifestManager
 from ssc.Servlet import Servlet
 
+
+logger = logging.getLogger(__name__)
 
 class ServletContainer:
     '''
@@ -13,8 +15,6 @@ class ServletContainer:
     MANIFEST_FILE_NAME = 'Manifest.py'
 
     def __init__(self, server, directoryPath):
-        self._log = Logger(self)
-
         # Servlet directory path
         self._directoryPath = directoryPath
 
@@ -29,7 +29,7 @@ class ServletContainer:
 
         self._manifestManager = ManifestManager(self, self._manifestPath, self._onServletAdded, self._onServletRemoved, self._onServletChanged)
 
-        self._log.d('Servlet container initialized')
+        logger.debug('Servlet container initialized')
 
     @property
     def rootDir(self):
@@ -69,7 +69,7 @@ class ServletContainer:
         path = os.path.join(self._directoryPath, manifestEntry.file)
 
         if not os.path.exists(path):
-            self._log.e('Could not find servlet file specified by manifest: %r' % path)
+            logger.error('Could not find servlet file specified by manifest: %r' % path)
 
             return
 
@@ -92,32 +92,32 @@ class ServletContainer:
         try:
             self._loadServlet(manifestEntry)
 
-            self._log.d('Servlet loaded: %r' % manifestEntry.file)
+            logger.debug('Servlet loaded: %r' % manifestEntry.file)
         except Exception as e:
-            self._log.e('Error loading servlet %r: %r' % (manifestEntry.file, str(e)))
+            logger.error('Error loading servlet %r: %r' % (manifestEntry.file, str(e)))
 
     def _onServletRemoved(self, manifestEntry):
         try:
             self._unloadServlet(manifestEntry)
 
-            self._log.d('Servlet unloaded: %r' % manifestEntry.file)
+            logger.debug('Servlet unloaded: %r' % manifestEntry.file)
         except Exception as e:
-            self._log.e('Error unloading servlet %r: %r' % (manifestEntry.file, str(e)))
+            logger.error('Error unloading servlet %r: %r' % (manifestEntry.file, str(e)))
 
     def _onServletChanged(self, manifestEntry):
         try:
             self._reloadServlet(manifestEntry)
 
-            self._log.d('Servlet reloaded: %r' % os.path.basename(manifestEntry.file))
+            logger.debug('Servlet reloaded: %r' % os.path.basename(manifestEntry.file))
         except Exception as e:
-            self._log.e('Error unloading servlet %r: %r' % (manifestEntry.file, str(e)))
+            logger.error('Error unloading servlet %r: %r' % (manifestEntry.file, str(e)))
 
     def _getServlet(self, request):
         if request.url.path == '/':
             pageHomeServlet = self._findServlet(self._manifestManager.pageHome)
 
             if not pageHomeServlet:
-                self._log.e('Could not find home page servlet: %r' % self._manifestManager.pageHome)
+                logger.error('Could not find home page servlet: %r' % self._manifestManager.pageHome)
 
             else:
                 return pageHomeServlet
@@ -127,11 +127,11 @@ class ServletContainer:
                 if i.match(request.url.path):
                     return servlet
 
-        if self._manifestManager.page404Servlet:
-            page404Servlet = self._findServlet(self._manifestManager.page404Servlet)
+        if self._manifestManager.page404:
+            page404Servlet = self._findServlet(self._manifestManager.page404)
 
             if not page404Servlet:
-                self._log.e('Could not find 404 servlet: %r' % self._manifestManager.page404)
+                logger.error('Could not find 404 servlet: %r' % self._manifestManager.page404)
 
             else:
                 return page404Servlet

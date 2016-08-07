@@ -1,7 +1,10 @@
+import logging
+
 from ssc.FileWatcher import FileWatcher
-from ssc.Logger import Logger
 from ssc.PageManifestEntry import PageManifestEntry
 
+
+logger = logging.getLogger(__name__)
 
 class ManifestManager:
     MANIFEST_DICT_NAME = 'manifest'
@@ -16,9 +19,7 @@ class ManifestManager:
 
     PAGE_PATTERN_KEY_NAME = 'pattern'
 
-    def __init__(self, servletContainer, manifestPath, onPageAdded, onPageRemoved, onPageChanged):
-        self._log = Logger(self)
-
+    def __init__(self, servletContainer, manifestPath, onPageAdded=None, onPageRemoved=None, onPageChanged=None, onManifestUpdated=None):
         # Parent servlet container
         self._servletContainer = servletContainer
 
@@ -34,6 +35,8 @@ class ManifestManager:
         # Callback called when servlet page entry has been changed
         self._onPageChanged = onPageChanged
 
+        self._onManifestUpdated = onManifestUpdated
+
         # List of page manifest entries
         self._pages = []
 
@@ -41,22 +44,23 @@ class ManifestManager:
         self._manfiestWatch = FileWatcher(self._manifestPath, lambda path: self._onManifestChanged())
         self._manfiestWatch.start()
 
+        self._page404 = None
+        self._pageHome = None
+
         # Run initial parse
         self._onManifestChanged()
-
-        self._page404 = None
-
-        self._pageHome = None
 
     def _onManifestChanged(self):
         '''
         Called when manifest file content has been changed
         '''
 
+        logger.debug('Updating manifest')
+
         try:
             manifest = self._readManifest()
         except Exception as e:
-            self._log.e('Error reading manifest: %r' % str(e))
+            logger.error('Error reading manifest: %r' % str(e))
 
             return
 
@@ -103,7 +107,10 @@ class ManifestManager:
 
         self._pageHome = manifest[ManifestManager.PAGE_HOME_KEY_NAME] if ManifestManager.PAGE_HOME_KEY_NAME in manifest else None
 
-        self._log.d('Manifest processed')
+        logger.debug('Manifest processed: ' + self._page404 + ' , ' + self._pageHome)
+
+        if self._onManifestUpdated:
+            self._onManifestUpdated(self)
 
     def _readManifest(self):
         '''
