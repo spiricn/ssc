@@ -20,7 +20,7 @@ class Servlet:
 
         self._makoTemplate = MakoTemplate(filename=fullServletPath, lookup=templateLookup)
 
-        self._regex = [re.compile(i) for i in manifestEntry.pattern]
+        self._regex = re.compile(manifestEntry.pattern) if manifestEntry.pattern else None
 
         self._manifestEntry = manifestEntry
 
@@ -29,6 +29,9 @@ class Servlet:
         self._fileWatcher = FileWatcher(fullServletPath, lambda path: self._sourceChangeCallback(self))
 
         self._fileWatcher.start()
+
+    def __str__(self):
+        return str(self._manifestEntry)
 
     def unload(self):
         self._fileWatcher.stop()

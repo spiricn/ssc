@@ -64,7 +64,15 @@ class ManifestManager:
 
             return
 
-        newPages = [ PageManifestEntry(i[ManifestManager.PAGE_FILE_KEY_NAME], i[ManifestManager.PAGE_PATTERN_KEY_NAME]) for i in manifest[ManifestManager.PAGES_KEY_NAME] ]
+
+        newPages = []
+
+        for i in manifest[ManifestManager.PAGES_KEY_NAME]:
+            pageFile = i[ManifestManager.PAGE_FILE_KEY_NAME]
+
+            pagePattern = i[ManifestManager.PAGE_PATTERN_KEY_NAME] if ManifestManager.PAGE_PATTERN_KEY_NAME in i else None
+
+            newPages.append(PageManifestEntry(pageFile, pagePattern))
 
         # Check if any pages have been deleted
         tmp = []

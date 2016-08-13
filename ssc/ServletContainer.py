@@ -126,9 +126,11 @@ class ServletContainer:
                 return pageHomeServlet
 
         for servlet in self._servlets:
-            for i in servlet.regex:
-                if i.match(request.url.path):
-                    return servlet
+            if not servlet.regex:
+                continue
+
+            if servlet.regex.match(request.url.path):
+                return servlet
 
         if os.path.isfile(os.path.join(self._directoryPath, request.url.path[1:])):
             return self._fileServlet

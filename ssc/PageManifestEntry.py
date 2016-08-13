@@ -31,3 +31,6 @@ class PageManifestEntry(object):
 
     def __neq__(self, other):
         return not (self == other)
+
+    def __str__(self):
+        return '{ManifestEntry: file=%r ; pattern=%r }' % (self._file, self._pattern)

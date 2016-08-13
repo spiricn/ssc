@@ -37,7 +37,6 @@ class FileServlet:
 
         for i in self.CONTENT_TYPE_MAP:
             if ext in i:
-                print(ext, self.CONTENT_TYPE_MAP[i])
                 return self.CONTENT_TYPE_MAP[i]
 
         return 'application/octet-stream'
