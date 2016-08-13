@@ -32,4 +32,7 @@ class HTTPResponse:
 
             self._headersSent = True
 
-        self._handler.wfile.write(bytes(data.encode('utf-8')))
+        if isinstance(data, bytes):
+            self._handler.wfile.write(data)
+        else:
+            self._handler.wfile.write(bytes(data.encode('utf-8')))

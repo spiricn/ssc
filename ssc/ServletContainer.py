@@ -3,6 +3,7 @@ import os
 
 from ssc.ManifestManager import ManifestManager
 from ssc.Servlet import Servlet
+from ssc.FileServlet import FileServlet
 
 
 logger = logging.getLogger(__name__)
@@ -16,7 +17,7 @@ class ServletContainer:
 
     def __init__(self, server, directoryPath):
         # Servlet directory path
-        self._directoryPath = directoryPath
+        self._directoryPath = os.path.realpath(directoryPath)
 
         # Reference to parent HTTP server
         self._server = server
@@ -28,6 +29,8 @@ class ServletContainer:
         self._manifestPath = os.path.join(self._directoryPath, ServletContainer.MANIFEST_FILE_NAME)
 
         self._manifestManager = ManifestManager(self, self._manifestPath, self._onServletAdded, self._onServletRemoved, self._onServletChanged)
+
+        self._fileServlet = FileServlet(self)
 
         logger.debug('Servlet container initialized')
 
@@ -127,6 +130,9 @@ class ServletContainer:
                 if i.match(request.url.path):
                     return servlet
 
+        if os.path.isfile(os.path.join(self._directoryPath, request.url.path[1:])):
+            return self._fileServlet
+
         if self._manifestManager.page404:
             page404Servlet = self._findServlet(self._manifestManager.page404)
 
@@ -138,11 +144,12 @@ class ServletContainer:
 
         return None
 
+    def _handleFile(self, request, response):
+        pass
+
     def handleRequest(self, request, response):
         servlet = self._getServlet(request)
+        if servlet:
+            return servlet.handleRequest(request, response)
 
-        if not servlet:
-            response.sendResponse(404)
-
-        else:
-            servlet.handleRequest(request, response)
+        return response.sendResponse(404)
