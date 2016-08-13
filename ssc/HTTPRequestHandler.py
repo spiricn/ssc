@@ -1,10 +1,11 @@
-from http.server import SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
 
+import ssc
 from ssc.HTTPRequest import HTTPRequest
 from ssc.HTTPResponse import HTTPResponse
 
 
-class HTTPRequestHandler(SimpleHTTPRequestHandler):
+class HTTPRequestHandler(BaseHTTPRequestHandler):
     '''
     Simple proxy class that delegates GET requests to the servlet container
     '''
@@ -16,6 +17,9 @@ class HTTPRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         return self.server.servletContainer.handleRequest(HTTPRequest(self), HTTPResponse(self))
+
+    def version_string(self):
+        return 'SSC ' + ssc.__version__
 
     def log_message(self, format, *args):
         pass

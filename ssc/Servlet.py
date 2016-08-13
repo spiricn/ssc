@@ -1,6 +1,7 @@
 import os
 import re
 
+from mako.lookup import TemplateLookup
 from mako.runtime import Context
 from mako.template import Template as MakoTemplate
 
@@ -9,9 +10,15 @@ from ssc.FileWatcher import FileWatcher
 
 class Servlet:
     def __init__(self, servletContainer, manifestEntry, sourceChangeCallback):
+        self._servletContainer = servletContainer
+
         fullServletPath = os.path.abspath(os.path.join(servletContainer.rootDir, manifestEntry.file))
 
-        self._makoTemplate = MakoTemplate(filename=fullServletPath)
+        templateLookup = TemplateLookup(directories=['/'],
+                       module_directory=self.servletContainer.rootDir
+        )
+
+        self._makoTemplate = MakoTemplate(filename=fullServletPath, lookup=templateLookup)
 
         self._regex = [re.compile(i) for i in manifestEntry.pattern]
 

@@ -1,6 +1,6 @@
 __author__ = 'Nikola Spiric'
 
-__copyright__ = 'Copyright 2014, libIDL project'
+__copyright__ = 'Copyright 2014, ssc project'
 
 __license__ = "MIT"
 
