@@ -1,9 +1,9 @@
 import logging
 import os
 
-from ssc.ManifestManager import ManifestManager
-from ssc.Servlet import Servlet
 from ssc.FileServlet import FileServlet
+from ssc.ManifestManager import ManifestManager
+from ssc.PageServlet import PageServlet
 
 
 logger = logging.getLogger(__name__)
@@ -15,9 +15,14 @@ class ServletContainer:
 
     MANIFEST_FILE_NAME = 'Manifest.py'
 
-    def __init__(self, server, directoryPath):
+    def __init__(self, server, directoryPath, tempDir):
         # Servlet directory path
         self._directoryPath = os.path.realpath(directoryPath)
+
+        self._tempDir = os.path.realpath(tempDir)
+
+        if not os.path.isdir(self._tempDir):
+            os.makedirs(self._tempDir)
 
         # Reference to parent HTTP server
         self._server = server
@@ -32,11 +37,21 @@ class ServletContainer:
 
         self._fileServlet = FileServlet(self)
 
+        self._env = {}
+
         logger.debug('Servlet container initialized')
+
+    @property
+    def env(self):
+        return self._env
 
     @property
     def rootDir(self):
         return self._directoryPath
+
+    @property
+    def tempDir(self):
+        return self._tempDir
 
     def _onServletSourceChanged(self, servlet):
         self._reloadServlet(servlet.manifestEntry)
@@ -47,8 +62,9 @@ class ServletContainer:
         '''
 
         for i in self._servlets:
-            if i.manifestEntry.file == file:
-                return i
+            if isinstance(i, PageServlet):
+                if i.manifestEntry and i.manifestEntry.file == file:
+                    return i
 
         return None
 
@@ -82,8 +98,11 @@ class ServletContainer:
         if oldServlet:
             self._unloadServlet(oldServlet)
 
-        servlet = Servlet(self, manifestEntry, self._onServletSourceChanged)
+        servlet = PageServlet(self, manifestEntry, self._onServletSourceChanged)
 
+        self._servlets.append(servlet)
+
+    def addServlet(self, servlet):
         self._servlets.append(servlet)
 
     def _reloadServlet(self, manifestEntry):

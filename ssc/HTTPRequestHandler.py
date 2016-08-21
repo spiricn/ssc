@@ -1,8 +1,12 @@
 from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
+import logging
 
 import ssc
 from ssc.HTTPRequest import HTTPRequest
 from ssc.HTTPResponse import HTTPResponse
+
+
+logger = logging.getLogger(__name__)
 
 
 class HTTPRequestHandler(BaseHTTPRequestHandler):
@@ -21,8 +25,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     def version_string(self):
         return 'SSC ' + ssc.__version__
 
-    def log_message(self, format, *args):
-        pass
+#     def log_message(self, format, *args):
+#         pass
 
     def log_request(self, code='-', size='-'):
         self.log_message('"%s" %s %s',

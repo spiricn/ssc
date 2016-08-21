@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from ssc.HTTPServer import HTTPServer
+from ssc.ThreadedHTTPServer import HTTPServer
 
 
 def programMain():
