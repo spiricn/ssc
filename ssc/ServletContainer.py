@@ -4,6 +4,8 @@ import os
 from ssc.FileServlet import FileServlet
 from ssc.ManifestManager import ManifestManager
 from ssc.PageServlet import PageServlet
+from ssc.RestServlet import RestServlet
+from ssc.HTTP import CODE_NOT_FOUND
 
 
 logger = logging.getLogger(__name__)
@@ -40,6 +42,15 @@ class ServletContainer:
         self._env = {}
 
         logger.debug('Servlet container initialized')
+
+    def addRestAPI(self, pattern='^\\/rest\\/'):
+        self._restServlet = RestServlet(self, pattern)
+
+        self.addServlet(self._restServlet)
+
+    @property
+    def rest(self):
+        return self._restServlet
 
     @property
     def env(self):
@@ -173,4 +184,4 @@ class ServletContainer:
         if servlet:
             return servlet.handleRequest(request, response)
 
-        return response.sendResponse(404)
+        return response.sendResponse(CODE_NOT_FOUND)

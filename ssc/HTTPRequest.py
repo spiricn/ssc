@@ -28,3 +28,6 @@ class HTTPRequest:
     @property
     def url(self):
         return self._url
+
+    def __str__(self):
+        return '{url=%r type=%d params=%r}' % (self._url, self._type, str(self._params))

@@ -25,8 +25,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
     def version_string(self):
         return 'SSC ' + ssc.__version__
 
-#     def log_message(self, format, *args):
-#         pass
+    def log_message(self, format, *args):
+        pass
 
     def log_request(self, code='-', size='-'):
         self.log_message('"%s" %s %s',

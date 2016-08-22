@@ -1,5 +1,7 @@
 import re
 
+from ssc.HTTP import CODE_NOT_IMPLEMENTED
+
 
 class Servlet:
     def __init__(self, servletContainer, pattern):
@@ -16,6 +18,6 @@ class Servlet:
         return self._servletContainer
 
     def handleRequest(self, request, response):
-        response.sendResponse(404)
+        response.sendResponse(CODE_NOT_IMPLEMENTED)
 
         return True

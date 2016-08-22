@@ -6,6 +6,7 @@ from mako.template import Template as MakoTemplate
 
 from ssc.FileWatcher import FileWatcher
 from ssc.Servlet import Servlet
+from ssc.HTTP import CODE_OK, HDR_CONTENT_TYPE, MIME_HTML
 
 
 class PageServlet(Servlet):
@@ -44,9 +45,9 @@ class PageServlet(Servlet):
         return self._servletContainer
 
     def handleRequest(self, request, response):
-        response.sendResponse(200)
+        response.sendResponse(CODE_OK)
 
-        response.sendHeader('Content-type', 'text/html')
+        response.sendHeader(HDR_CONTENT_TYPE, MIME_HTML)
 
         self._makoTemplate.render_context(Context(response, request=request, response=response, **self._servletContainer.env))
 
