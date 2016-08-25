@@ -1,7 +1,7 @@
 import logging
 
-from ssc.FileWatcher import FileWatcher
-from ssc.PageManifestEntry import PageManifestEntry
+from ssc.manifest.PageManifestEntry import PageManifestEntry
+from ssc.utils.FileWatcher import FileWatcher
 
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
 import re
 
-from ssc.HTTP import CODE_NOT_IMPLEMENTED
+from ssc.http.HTTP import CODE_NOT_IMPLEMENTED
 
 
 class Servlet:

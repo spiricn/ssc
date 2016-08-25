@@ -1,6 +1,3 @@
-
-
-
 MIME_JSON = 'application/json'
 MIME_CSS = 'text/css'
 MIME_TEXT = 'text/plain'
@@ -12,7 +9,8 @@ MIME_BINARY = 'application/octet-stream'
 
 HDR_CONTENT_TYPE = 'Content-type'
 HDR_CONTENT_LENGTH = 'Content-length'
-
+HDR_ACCEPT = 'Accept'
+HDR_USER_AGENT = 'User-Agent'
 
 CODE_OK = 200
 CODE_BAD_REQUEST = 400

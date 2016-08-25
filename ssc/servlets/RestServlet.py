@@ -2,9 +2,9 @@ from collections import namedtuple, OrderedDict
 import json
 import logging
 
-from ssc.Servlet import Servlet
-from ssc.HTTP import HDR_CONTENT_TYPE, MIME_HTML, CODE_BAD_REQUEST, CODE_OK, \
+from ssc.http.HTTP import HDR_CONTENT_TYPE, CODE_BAD_REQUEST, MIME_HTML, CODE_OK, \
     MIME_JSON
+from ssc.servlets.Servlet import Servlet
 
 
 logger = logging.getLogger(__name__)
@@ -27,8 +27,8 @@ class RestServlet(Servlet):
         for path, callback in api:
             self.addHandler(path, callback)
 
-    def addHandler(self, path, callback, help='N/A'):
-        self._handlers.append(RestHandler(path, callback, help='N/A'))
+    def addHandler(self, path, callback, helpDoc='N/A'):
+        self._handlers.append(RestHandler(path, callback, helpDoc))
 
     def _parseType(self, obj):
         if isinstance(obj, tuple):

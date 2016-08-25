@@ -3,21 +3,20 @@ import logging
 import socket
 from socketserver import TCPServer, ThreadingMixIn
 
-from ssc.HTTPRequestHandler import HTTPRequestHandler
-from ssc.ServletContainer import ServletContainer
+from ssc.http.HTTPRequestHandler import HTTPRequestHandler
 
 
 logger = logging.getLogger(__name__)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    def __init__(self, rootDir, port, tempDir):
-        self._servletContainer = ServletContainer(self, rootDir, tempDir)
-
-        TCPServer.__init__(self, ("", 13099), HTTPRequestHandler)
+    def __init__(self, port, requestHandler):
+        TCPServer.__init__(self, ("", port), HTTPRequestHandler)
+        self._requestHandler = requestHandler
+        self._port = port
 
     @property
-    def servletContainer(self):
-        return self._servletContainer
+    def requestHandler(self):
+        return self._requestHandler
 
     def server_bind(self):
         self.allow_reuse_address = True
@@ -29,7 +28,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
             self.handle_request()
 
     def start(self):
-        logger.debug('Server running')
+        logger.debug('Server running @ %d' % self._port)
 
         self._running = True
 

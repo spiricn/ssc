@@ -1,11 +1,12 @@
 import logging
 import os
 
-from ssc.FileServlet import FileServlet
-from ssc.ManifestManager import ManifestManager
-from ssc.PageServlet import PageServlet
-from ssc.RestServlet import RestServlet
-from ssc.HTTP import CODE_NOT_FOUND
+from ssc.http.HTTP import CODE_NOT_FOUND
+from ssc.manifest.ManifestManager import ManifestManager
+from ssc.servlets.FileServlet import FileServlet
+from ssc.servlets.PageServlet import PageServlet
+from ssc.servlets.RestServlet import RestServlet
+from ssc.http.ThreadedHTTPServer import ThreadedHTTPServer
 
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,7 @@ class ServletContainer:
 
     MANIFEST_FILE_NAME = 'Manifest.py'
 
-    def __init__(self, server, directoryPath, tempDir):
+    def __init__(self, port, directoryPath, tempDir):
         # Servlet directory path
         self._directoryPath = os.path.realpath(directoryPath)
 
@@ -27,7 +28,7 @@ class ServletContainer:
             os.makedirs(self._tempDir)
 
         # Reference to parent HTTP server
-        self._server = server
+        self._server = ThreadedHTTPServer(port, self.handleRequest)
 
         # List of all loaded servlets
         self._servlets = []
@@ -41,7 +42,13 @@ class ServletContainer:
 
         self._env = {}
 
+        self._restServlet = None
+
         logger.debug('Servlet container initialized')
+
+
+    def start(self):
+        return self._server.start()
 
     def addRestAPI(self, pattern='^\\/rest\\/'):
         self._restServlet = RestServlet(self, pattern)
@@ -50,6 +57,8 @@ class ServletContainer:
 
     @property
     def rest(self):
+        if not self._restServlet:
+            raise RuntimeError('Rest servlet not created, call "addRestAPI" first')
         return self._restServlet
 
     @property

@@ -2,8 +2,8 @@ from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
 import logging
 
 import ssc
-from ssc.HTTPRequest import HTTPRequest
-from ssc.HTTPResponse import HTTPResponse
+from ssc.http.HTTPRequest import HTTPRequest
+from ssc.http.HTTPResponse import HTTPResponse
 
 
 logger = logging.getLogger(__name__)
@@ -20,17 +20,17 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         SimpleHTTPRequestHandler.__init__(self, request, client_address, server)
 
     def do_GET(self):
-        return self.server.servletContainer.handleRequest(HTTPRequest(self), HTTPResponse(self))
+        return self.server.requestHandler(HTTPRequest(self), HTTPResponse(self))
 
     def version_string(self):
         return 'SSC ' + ssc.__version__
 
-    def log_message(self, format, *args):
+    def log_message(self, fmt, *args):
         pass
 
     def log_request(self, code='-', size='-'):
         self.log_message('"%s" %s %s',
                          self.requestline, str(code), str(size))
 
-    def log_error(self, format, *args):
-        self.log_message(format, *args)
+    def log_error(self, fmt, *args):
+        self.log_message(fmt, *args)

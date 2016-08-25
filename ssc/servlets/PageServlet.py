@@ -1,12 +1,11 @@
-import os
-
 from mako.lookup import TemplateLookup
 from mako.runtime import Context
 from mako.template import Template as MakoTemplate
+import os
 
-from ssc.FileWatcher import FileWatcher
-from ssc.Servlet import Servlet
-from ssc.HTTP import CODE_OK, HDR_CONTENT_TYPE, MIME_HTML
+from ssc.http.HTTP import CODE_OK, HDR_CONTENT_TYPE, MIME_HTML
+from ssc.servlets.Servlet import Servlet
+from ssc.utils.FileWatcher import FileWatcher
 
 
 class PageServlet(Servlet):
