@@ -9,10 +9,11 @@ from ssc.http.HTTPRequestHandler import HTTPRequestHandler
 logger = logging.getLogger(__name__)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    def __init__(self, port, requestHandler):
-        TCPServer.__init__(self, ("", port), HTTPRequestHandler)
+    def __init__(self, address, port, requestHandler):
         self._requestHandler = requestHandler
         self._port = port
+
+        TCPServer.__init__(self, (address, port), HTTPRequestHandler)
 
     @property
     def requestHandler(self):
@@ -23,14 +24,9 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind(self.server_address)
 
+        logger.debug('Starting TCP server at %s' % str(self.server_address))
+
     def serve_forever(self):
         while self._running:
             self.handle_request()
-
-    def start(self):
-        logger.debug('Server running @ %d' % self._port)
-
-        self._running = True
-
-        self.serve_forever()
 

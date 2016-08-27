@@ -2,11 +2,11 @@ import logging
 import os
 
 from ssc.http.HTTP import CODE_NOT_FOUND
+from ssc.http.ThreadedHTTPServer import ThreadedHTTPServer
 from ssc.manifest.ManifestManager import ManifestManager
 from ssc.servlets.FileServlet import FileServlet
 from ssc.servlets.PageServlet import PageServlet
 from ssc.servlets.RestServlet import RestServlet
-from ssc.http.ThreadedHTTPServer import ThreadedHTTPServer
 
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class ServletContainer:
 
     MANIFEST_FILE_NAME = 'Manifest.py'
 
-    def __init__(self, port, directoryPath, tempDir):
+    def __init__(self, address, port, directoryPath, tempDir):
         # Servlet directory path
         self._directoryPath = os.path.realpath(directoryPath)
 
@@ -28,7 +28,7 @@ class ServletContainer:
             os.makedirs(self._tempDir)
 
         # Reference to parent HTTP server
-        self._server = ThreadedHTTPServer(port, self.handleRequest)
+        self._server = ThreadedHTTPServer(address, port, self.handleRequest)
 
         # List of all loaded servlets
         self._servlets = []
