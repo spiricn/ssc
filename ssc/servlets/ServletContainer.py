@@ -44,7 +44,7 @@ class ServletContainer:
 
         self._restServlet = None
 
-        logger.debug('Servlet container initialized')
+        logger.debug('Servlet container initialized:\n Root: %r\n Tmp: %r' % (self._directoryPath, self._tempDir))
 
 
     def start(self):
@@ -189,6 +189,10 @@ class ServletContainer:
         pass
 
     def handleRequest(self, request, response):
+        if request.url.path == '/favicon.ico' and self._manifestManager.favIcon:
+            raise  1
+            return self._fileServlet.downloadFile(self._manifestManager.favIcon, response)
+
         servlet = self._getServlet(request)
         if servlet:
             return servlet.handleRequest(request, response)

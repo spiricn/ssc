@@ -10,14 +10,11 @@ class ManifestManager:
     MANIFEST_DICT_NAME = 'manifest'
 
     PAGES_KEY_NAME = 'pages'
-
     PAGE_404_KEY_NAME = '404_page'
-
     PAGE_HOME_KEY_NAME = 'home_page'
-
     PAGE_FILE_KEY_NAME = 'file'
-
     PAGE_PATTERN_KEY_NAME = 'pattern'
+    FAV_ICO_KEY_NAME = 'favicon'
 
     def __init__(self, servletContainer, manifestPath, onPageAdded=None, onPageRemoved=None, onPageChanged=None, onManifestUpdated=None):
         # Parent servlet container
@@ -115,6 +112,8 @@ class ManifestManager:
 
         self._pageHome = manifest[ManifestManager.PAGE_HOME_KEY_NAME] if ManifestManager.PAGE_HOME_KEY_NAME in manifest else None
 
+        self._favIco = manifest[ManifestManager.FAV_ICO_KEY_NAME] if ManifestManager.FAV_ICO_KEY_NAME in manifest else None
+
         logger.debug('Manifest processed: ' + self._page404 + ' , ' + self._pageHome)
 
         if self._onManifestUpdated:
@@ -159,3 +158,7 @@ class ManifestManager:
     @property
     def pageHome(self):
         return self._pageHome
+
+    @property
+    def favIcon(self):
+        return self._favIco

@@ -6,6 +6,7 @@ MIME_IMAGE_JPEG = 'image/jpeg'
 MIME_IMAGE_PNG = 'image/png'
 MIME_JSON = 'application/json'
 MIME_BINARY = 'application/octet-stream'
+MIME_SVG = 'image/svg+xml'
 
 HDR_CONTENT_TYPE = 'Content-type'
 HDR_CONTENT_LENGTH = 'Content-length'
