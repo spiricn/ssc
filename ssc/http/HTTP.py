@@ -18,3 +18,38 @@ CODE_BAD_REQUEST = 400
 CODE_NOT_FOUND = 404
 CODE_INTERNAL_SERVER_ERROR = 500
 CODE_NOT_IMPLEMENTED = 501
+
+EXT_TO_CONTENT_TYPE = {
+ (
+    '.css',
+ ) : MIME_CSS,
+
+ (
+    '.txt',
+    '.py',
+    '.c',
+    '.cpp',
+    '.h',
+    '.java',
+    '.js',
+    '.html'
+ ) : MIME_TEXT,
+
+ (
+    '.jpg',
+    '.jpeg',
+ ) : MIME_IMAGE_JPEG,
+
+ (
+    '.png',
+ ) : MIME_IMAGE_PNG,
+
+ (
+    '.json',
+ ) : MIME_JSON,
+
+ (
+    '.svg',
+ ) : MIME_SVG
+
+}
