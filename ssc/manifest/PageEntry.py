@@ -1,15 +1,14 @@
-class PageManifestEntry(object):
-    def __init__(self, file, pattern):
-        self._file = file
-
+class PageEntry(object):
+    def __init__(self, filePath, pattern):
+        self._filePath = filePath
         self._pattern = pattern
 
     @property
-    def file(self):
+    def filePath(self):
         '''
         Servlet path relative to container root directory
         '''
-        return self._file
+        return self._filePath
 
     @property
     def pattern(self):
@@ -19,12 +18,12 @@ class PageManifestEntry(object):
 
         return self._pattern
 
-    @file.setter
-    def file(self, value):
-        self._file = value
+    @filePath.setter
+    def filePath(self, value):
+        self._filePath = value
 
     def __eq__(self, other):
-        if isinstance(other, PageManifestEntry):
+        if isinstance(other, PageEntry):
             return self._pattern == other._pattern and self._file == other._file
         else:
             return False

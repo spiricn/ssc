@@ -36,7 +36,10 @@ class ServletContainer:
         # Full manifest file path
         self._manifestPath = os.path.join(self._directoryPath, ServletContainer.MANIFEST_FILE_NAME)
 
-        self._manifestManager = ManifestManager(self, self._manifestPath, self._onServletAdded, self._onServletRemoved, self._onServletChanged)
+        self._manifestManager = ManifestManager(self._manifestPath,
+                                                self._onServletAdded,
+                                                self._onServletRemoved,
+                                                self._onServletChanged)
 
         self._fileServlet = FileServlet(self)
 
@@ -48,7 +51,7 @@ class ServletContainer:
 
 
     def start(self):
-        return self._server.start()
+        return self._server.serve_forever()
 
     def addRestAPI(self, pattern='^\\/rest\\/'):
         self._restServlet = RestServlet(self, pattern)
@@ -59,6 +62,7 @@ class ServletContainer:
     def rest(self):
         if not self._restServlet:
             raise RuntimeError('Rest servlet not created, call "addRestAPI" first')
+
         return self._restServlet
 
     @property
@@ -76,14 +80,14 @@ class ServletContainer:
     def _onServletSourceChanged(self, servlet):
         self._reloadServlet(servlet.manifestEntry)
 
-    def _findServlet(self, file):
+    def _findServlet(self, filePath):
         '''
         Finds servlet with given name
         '''
 
         for i in self._servlets:
             if isinstance(i, PageServlet):
-                if i.manifestEntry and i.manifestEntry.file == file:
+                if i.manifestEntry and i.manifestEntry.filePath == filePath:
                     return i
 
         return None
@@ -93,7 +97,7 @@ class ServletContainer:
         Unloads servlet
         '''
 
-        servlet = self._findServlet(manifestEntry.file)
+        servlet = self._findServlet(manifestEntry.filePath)
 
         servlet.unload()
 
@@ -105,7 +109,7 @@ class ServletContainer:
         '''
 
         # Full servlet path
-        path = os.path.join(self._directoryPath, manifestEntry.file)
+        path = os.path.join(self._directoryPath, manifestEntry.filePath)
 
         if not os.path.exists(path):
             logger.error('Could not find servlet file specified by manifest: %r' % path)
@@ -113,7 +117,7 @@ class ServletContainer:
             return
 
         # Unload old version of servlet if possible
-        oldServlet = self._findServlet(manifestEntry.file)
+        oldServlet = self._findServlet(manifestEntry.filePath)
 
         if oldServlet:
             self._unloadServlet(oldServlet)
@@ -134,9 +138,9 @@ class ServletContainer:
         try:
             self._loadServlet(manifestEntry)
 
-            logger.debug('Servlet loaded: %r' % manifestEntry.file)
+            logger.debug('Servlet loaded: %r' % manifestEntry.filePath)
         except Exception as e:
-            logger.error('Error loading servlet %r: %r' % (manifestEntry.file, str(e)))
+            logger.error('Error loading servlet %r: %r' % (manifestEntry.filePath, str(e)))
 
     def _onServletRemoved(self, manifestEntry):
         try:
@@ -144,15 +148,15 @@ class ServletContainer:
 
             logger.debug('Servlet unloaded: %r' % manifestEntry.file)
         except Exception as e:
-            logger.error('Error unloading servlet %r: %r' % (manifestEntry.file, str(e)))
+            logger.error('Error unloading servlet %r: %r' % (manifestEntry.filePath, str(e)))
 
     def _onServletChanged(self, manifestEntry):
         try:
             self._reloadServlet(manifestEntry)
 
-            logger.debug('Servlet reloaded: %r' % os.path.basename(manifestEntry.file))
+            logger.debug('Servlet reloaded: %r' % os.path.basename(manifestEntry.filePath))
         except Exception as e:
-            logger.error('Error unloading servlet %r: %r' % (manifestEntry.file, str(e)))
+            logger.error('Error unloading servlet %r: %r' % (manifestEntry.filePath, str(e)))
 
     def _getServlet(self, request):
         if request.url.path == '/':
@@ -174,27 +178,26 @@ class ServletContainer:
         if os.path.isfile(os.path.join(self._directoryPath, request.url.path[1:])):
             return self._fileServlet
 
-        if self._manifestManager.page404:
-            page404Servlet = self._findServlet(self._manifestManager.page404)
-
-            if not page404Servlet:
-                logger.error('Could not find 404 servlet: %r' % self._manifestManager.page404)
-
-            else:
-                return page404Servlet
-
         return None
 
-    def _handleFile(self, request, response):
-        pass
+    def handle404(self, request, response):
+        page404Servlet = self._findServlet(self._manifestManager.page404)
+
+        if not page404Servlet:
+            logger.warning('Could not find 404 servlet: %r' % self._manifestManager.page404)
+
+            response.sendResponse(CODE_NOT_FOUND)
+            response.write('<html><head>404</head><body>Not found</body></html>')
+
+            return True
+
+        else:
+            return page404Servlet.handleRequest(request, response)
 
     def handleRequest(self, request, response):
-        if request.url.path == '/favicon.ico' and self._manifestManager.favIcon:
-            raise  1
-            return self._fileServlet.downloadFile(self._manifestManager.favIcon, response)
-
         servlet = self._getServlet(request)
         if servlet:
-            return servlet.handleRequest(request, response)
+            if servlet.handleRequest(request, response):
+                return True
 
-        return response.sendResponse(CODE_NOT_FOUND)
+        return self.handle404(request, response)

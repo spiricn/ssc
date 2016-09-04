@@ -13,7 +13,7 @@ class PageServlet(Servlet):
         Servlet.__init__(self, servletContainer, None if not manifestEntry else manifestEntry.pattern)
         self._servletContainer = servletContainer
 
-        fullServletPath = os.path.abspath(os.path.join(servletContainer.rootDir, manifestEntry.file))
+        fullServletPath = os.path.abspath(os.path.join(servletContainer.rootDir, manifestEntry.filePath))
 
         templateLookup = TemplateLookup(directories=['/'],
                        module_directory=self.servletContainer.tempDir

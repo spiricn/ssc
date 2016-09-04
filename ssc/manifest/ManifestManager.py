@@ -1,6 +1,6 @@
 import logging
 
-from ssc.manifest.PageManifestEntry import PageManifestEntry
+from ssc.manifest.PageEntry import PageEntry
 from ssc.utils.FileWatcher import FileWatcher
 
 
@@ -14,12 +14,8 @@ class ManifestManager:
     PAGE_HOME_KEY_NAME = 'home_page'
     PAGE_FILE_KEY_NAME = 'file'
     PAGE_PATTERN_KEY_NAME = 'pattern'
-    FAV_ICO_KEY_NAME = 'favicon'
 
-    def __init__(self, servletContainer, manifestPath, onPageAdded=None, onPageRemoved=None, onPageChanged=None, onManifestUpdated=None):
-        # Parent servlet container
-        self._servletContainer = servletContainer
-
+    def __init__(self, manifestPath, onPageAdded=None, onPageRemoved=None, onPageChanged=None, onManifestUpdated=None):
         # Manifest file path (relative to container root)
         self._manifestPath = manifestPath
 
@@ -43,6 +39,7 @@ class ManifestManager:
 
         self._page404 = None
         self._pageHome = None
+        self._favIco = None
 
         # Run initial parse
         self._onManifestChanged()
@@ -54,6 +51,8 @@ class ManifestManager:
 
         logger.debug('Updating manifest')
 
+
+        # Try reading manfiest from file
         try:
             manifest = self._readManifest()
         except Exception as e:
@@ -62,14 +61,12 @@ class ManifestManager:
             return
 
 
+        # Generate a list of new pages from manifest
         newPages = []
-
         for i in manifest[ManifestManager.PAGES_KEY_NAME]:
             pageFile = i[ManifestManager.PAGE_FILE_KEY_NAME]
-
             pagePattern = i[ManifestManager.PAGE_PATTERN_KEY_NAME] if ManifestManager.PAGE_PATTERN_KEY_NAME in i else None
-
-            newPages.append(PageManifestEntry(pageFile, pagePattern))
+            newPages.append(PageEntry(pageFile, pagePattern))
 
         # Check if any pages have been deleted
         tmp = []
@@ -78,7 +75,7 @@ class ManifestManager:
             pageExists = False
 
             for newPage in newPages:
-                if newPage.file == oldPage.file:
+                if newPage.filePath == oldPage.filePath:
                     pageExists = True
                     break
 
@@ -92,7 +89,7 @@ class ManifestManager:
 
         # Check for changed entries and added pages
         for newPage in newPages:
-            oldPage = self._findPageByFile(newPage.file)
+            oldPage = self._findPageByFile(newPage.filePath)
 
             if oldPage and newPage != oldPage:
                 # Replace old entry with new
@@ -108,13 +105,16 @@ class ManifestManager:
 
                 self._onPageAdded(newPage)
 
+        # Check special pages
         self._page404 = manifest[ManifestManager.PAGE_404_KEY_NAME] if ManifestManager.PAGE_404_KEY_NAME in manifest else None
+        if not self._page404:
+            logger.warning('page 404 not found')
 
         self._pageHome = manifest[ManifestManager.PAGE_HOME_KEY_NAME] if ManifestManager.PAGE_HOME_KEY_NAME in manifest else None
+        if not self._pageHome:
+            logger.warning('home page not found')
 
-        self._favIco = manifest[ManifestManager.FAV_ICO_KEY_NAME] if ManifestManager.FAV_ICO_KEY_NAME in manifest else None
-
-        logger.debug('Manifest processed: ' + self._page404 + ' , ' + self._pageHome)
+        logger.debug('Manifest processed')
 
         if self._onManifestUpdated:
             self._onManifestUpdated(self)
@@ -144,11 +144,10 @@ class ManifestManager:
 
         return manifest
 
-    def _findPageByFile(self, file):
+    def _findPageByFile(self, filePath):
         for page in self._pages:
-            if file == page.file:
+            if filePath == page.filePath:
                 return page
-
         return None
 
     @property
@@ -158,7 +157,3 @@ class ManifestManager:
     @property
     def pageHome(self):
         return self._pageHome
-
-    @property
-    def favIcon(self):
-        return self._favIco
