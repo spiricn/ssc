@@ -12,6 +12,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     def __init__(self, address, port, requestHandler):
         self._requestHandler = requestHandler
         self._port = port
+        self._running = True
 
         TCPServer.__init__(self, (address, port), HTTPRequestHandler)
 

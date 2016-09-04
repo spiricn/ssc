@@ -20,6 +20,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
         SimpleHTTPRequestHandler.__init__(self, request, client_address, server)
 
     def do_GET(self):
+        return self._handleRequest()
+
+    def do_POST(self):
+        return self._handleRequest()
+
+    def _handleRequest(self):
         return self.server.requestHandler(HTTPRequest(self), HTTPResponse(self))
 
     def version_string(self):

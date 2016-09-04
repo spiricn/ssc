@@ -33,6 +33,10 @@ class HTTPResponse:
             self._headersSent = True
 
         if isinstance(data, bytes):
-            self._handler.wfile.write(data)
+            try:
+                self._handler.wfile.write(data)
+            except ConnectionAbortedError:
+                return False
         else:
             self._handler.wfile.write(bytes(data.encode('utf-8')))
+            return True
