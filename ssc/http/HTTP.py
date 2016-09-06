@@ -46,6 +46,7 @@ EXT_TO_CONTENT_TYPE = {
 
  (
     '.json',
+    '.map',
  ) : MIME_JSON,
 
  (
