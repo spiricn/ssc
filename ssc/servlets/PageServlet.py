@@ -26,7 +26,6 @@ class PageServlet(Servlet):
         self._sourceChangeCallback = sourceChangeCallback
 
         self._fileWatcher = FileWatcher(fullServletPath, lambda path: self._sourceChangeCallback(self))
-
         self._fileWatcher.start()
 
     def __str__(self):

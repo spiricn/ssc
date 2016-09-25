@@ -2,6 +2,7 @@ from http.server import HTTPServer
 import logging
 import socket
 from socketserver import TCPServer, ThreadingMixIn
+from threading import Thread
 
 from ssc.http.HTTPRequestHandler import HTTPRequestHandler
 
@@ -27,7 +28,12 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
         logger.debug('Starting TCP server at %s' % str(self.server_address))
 
-    def serve_forever(self):
-        while self._running:
-            self.handle_request()
 
+    def start(self):
+        self._thread = Thread(target=self.serve_forever)
+        self._thread.setName('ServerThread')
+        self._thread.start()
+
+    def stop(self):
+        self.shutdown()
+        self._thread.join()

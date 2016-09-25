@@ -51,7 +51,14 @@ class ServletContainer:
 
 
     def start(self):
-        return self._server.serve_forever()
+        return self._server.start()
+
+    def stop(self):
+        self._manifestManager.stop()
+
+        self._unloadServlets()
+
+        return self._server.stop()
 
     def addRestAPI(self, pattern='^\\/rest\\/'):
         self._restServlet = RestServlet(self, pattern)
@@ -92,13 +99,17 @@ class ServletContainer:
 
         return None
 
+    def _unloadServlets(self):
+        while self._servlets:
+            self._unloadSingleServlet(self._servlets[0])
+
     def _unloadServlet(self, manifestEntry):
         '''
         Unloads servlet
         '''
+        self._unloadSingleServlet(self._findServlet(manifestEntry.filePath))
 
-        servlet = self._findServlet(manifestEntry.filePath)
-
+    def _unloadSingleServlet(self, servlet):
         servlet.unload()
 
         self._servlets.remove(servlet)

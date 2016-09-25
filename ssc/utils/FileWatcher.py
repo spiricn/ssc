@@ -10,6 +10,8 @@ class FileWatcher(Thread):
     def __init__(self, path, callback, pollIntervalMs=500):
         Thread.__init__(self)
 
+        self.setName(os.path.basename(__file__) + ':' + os.path.basename(path))
+
         self._path = path
 
         self._callback = callback
@@ -20,6 +22,7 @@ class FileWatcher(Thread):
 
     def stop(self):
         self._running = False
+        self.join()
 
     def run(self):
         prevTime = None

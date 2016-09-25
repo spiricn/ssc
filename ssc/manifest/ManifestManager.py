@@ -44,6 +44,9 @@ class ManifestManager:
         # Run initial parse
         self._onManifestChanged()
 
+    def stop(self):
+        self._manfiestWatch.stop()
+
     def _onManifestChanged(self):
         '''
         Called when manifest file content has been changed

@@ -13,6 +13,9 @@ class Servlet:
     def regex(self):
         return self._regex
 
+    def unload(self):
+        pass
+
     @property
     def servletContainer(self):
         return self._servletContainer
