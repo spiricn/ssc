@@ -1,30 +1,36 @@
 import os
-from threading import Thread
+from threading import Thread, currentThread
 import time
 
-class FileWatcher(Thread):
+class FileWatcher():
     '''
     Class that monitors a file and sends out a callback whren the file changes
     '''
 
     def __init__(self, path, callback, pollIntervalMs=500):
-        Thread.__init__(self)
-
-        self.setName(os.path.basename(__file__) + ':' + os.path.basename(path))
-
         self._path = path
 
         self._callback = callback
 
         self._pollIntervaSec = pollIntervalMs / 1000.0
 
-        self._running = True
+        self._running = False
 
     def stop(self):
-        self._running = False
-        self.join()
+        if not self._running:
+            raise  RuntimeError('already stopped')
 
-    def run(self):
+        self._running = False
+
+    def start(self):
+        self._thread = Thread(target=self._run,
+                              name=os.path.basename(__file__) + ':' + os.path.basename(self._path)
+                              )
+        self._thread.start()
+
+    def _run(self):
+        self._running = True
+
         prevTime = None
 
         fileExists = True
