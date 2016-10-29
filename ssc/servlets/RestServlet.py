@@ -2,14 +2,16 @@ from collections import namedtuple, OrderedDict
 import json
 import logging
 
+
 from ssc.http.HTTP import HDR_CONTENT_TYPE, CODE_BAD_REQUEST, MIME_HTML, CODE_OK, \
-    MIME_JSON
+    MIME_JSON, HDR_TRANSFER_ENCODING, TRANSFER_ENCODING_CHUNKED
 from ssc.servlets.Servlet import Servlet
 
 
 logger = logging.getLogger(__name__)
 
-RestHandler = namedtuple('RestHandler', 'path, callback, help')
+RestHandler = namedtuple('RestHandler', 'path, callback, help, chunked')
+RestHandler.__new__.__defaults__ = (None,) * len(RestHandler._fields)
 
 class RestServlet(Servlet):
     def __init__(self, servletContainer, pattern):
@@ -17,18 +19,18 @@ class RestServlet(Servlet):
 
         self._handlers = []
 
-        self.addHandler('api', self._apiDisplay)
+        self.addHandler(RestHandler('api', self._apiDisplay))
 
     @property
     def handlers(self):
         return self._handlers
 
     def addApi(self, api):
-        for path, callback in api:
-            self.addHandler(path, callback)
+        for handler in api:
+            self.addHandler(handler)
 
-    def addHandler(self, path, callback, helpDoc='N/A'):
-        self._handlers.append(RestHandler(path, callback, helpDoc))
+    def addHandler(self, handler):
+        self._handlers.append(handler)
 
     @classmethod
     def objToJson(cls, obj):
@@ -45,6 +47,16 @@ class RestServlet(Servlet):
         else:
             return str(obj)
 
+    def sendChunk(self, response, data):
+        chunkLength = hex(len(data))[2:] if data else '0'
+
+        response.write(chunkLength)
+        response.write('\r\n')
+        if data:
+            response.write(data)
+        response.write('\r\n')
+        response.flush()
+
     def handleRequest(self, request, response):
         path = request.url.path.split('/')[2:]
 
@@ -56,9 +68,20 @@ class RestServlet(Servlet):
                 response.sendResponse(code)
                 response.sendHeader(HDR_CONTENT_TYPE, mime)
 
-                response.write(self.objToJson(res))
+                if not handler.chunked:
+                    response.write(self.objToJson(res))
 
-                return True
+                    return True
+
+                else:
+                    response.sendHeader(HDR_TRANSFER_ENCODING, TRANSFER_ENCODING_CHUNKED)
+
+                    for data in res:
+                        self.sendChunk(response, data)
+
+                    self.sendChunk(response, None)
+
+                    return True
 
         logger.error('REST path %r not supported' % path)
 

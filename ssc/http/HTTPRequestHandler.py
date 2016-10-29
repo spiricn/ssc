@@ -2,6 +2,7 @@ from http.server import SimpleHTTPRequestHandler, BaseHTTPRequestHandler
 import logging
 
 import ssc
+from ssc.http.HTTP import PROTOCOL_VERSION_1_1
 from ssc.http.HTTPRequest import HTTPRequest
 from ssc.http.HTTPResponse import HTTPResponse
 
@@ -16,6 +17,8 @@ class HTTPRequestHandler(BaseHTTPRequestHandler):
 
     def __init__(self, request, client_address, server):
         self._server = server
+
+        self.protocol_version = PROTOCOL_VERSION_1_1
 
         SimpleHTTPRequestHandler.__init__(self, request, client_address, server)
 
