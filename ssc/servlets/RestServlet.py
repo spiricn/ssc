@@ -30,15 +30,18 @@ class RestServlet(Servlet):
     def addHandler(self, path, callback, helpDoc='N/A'):
         self._handlers.append(RestHandler(path, callback, helpDoc))
 
-    def _parseType(self, obj):
+    @classmethod
+    def objToJson(cls, obj):
         if isinstance(obj, tuple):
-            return self._parseType(obj._asdict())
+            return cls.objToJson(obj._asdict())
         elif isinstance(obj, OrderedDict):
-            return self._parseType(dict(obj))
-        elif isinstance(obj, dict):
-            return json.dumps(obj)
+            return cls.objToJson(dict(obj))
         elif obj == None:
             return ''
+        elif hasattr(obj, '_asdict'):
+            return cls.objToJson(obj._asdict())
+        elif isinstance(obj, dict):
+            return json.dumps(obj)
         else:
             return str(obj)
 
@@ -53,7 +56,7 @@ class RestServlet(Servlet):
                 response.sendResponse(code)
                 response.sendHeader(HDR_CONTENT_TYPE, mime)
 
-                response.write(self._parseType(res))
+                response.write(self.objToJson(res))
 
                 return True
 
