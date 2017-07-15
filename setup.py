@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 import ssc
 
@@ -17,7 +17,7 @@ setup(
 
       package_dir={'ssc' : 'ssc'},
 
-      packages=['ssc', 'ssc' ],
+      packages=find_packages(),
 
 	  license=ssc.__license__
 )
