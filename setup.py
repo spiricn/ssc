@@ -19,5 +19,7 @@ setup(
 
       packages=find_packages(),
 
-	  license=ssc.__license__
+	  license=ssc.__license__,
+
+    install_requires=['mako'],
 )
