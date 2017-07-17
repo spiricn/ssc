@@ -1,4 +1,6 @@
-from ssc.http.HTTP import HDR_CONNECTION, CONNECTION_CLOSE
+from ss.server.HTTP import HDR_CONNECTION, CONNECTION_CLOSE
+
+
 class HTTPResponse:
     def __init__(self, handler):
         self._handler = handler
@@ -28,6 +30,14 @@ class HTTPResponse:
 
         self._handler.send_header(key, value)
 
+    def finish(self):
+        if not self._responseSent:
+            raise RuntimeError('Must first send response before finishing')
+
+        if not self._headersSent:
+            self._handler.end_headers()
+            self._headersSent = True
+
     def write(self, data):
         if not self._responseSent:
             raise RuntimeError('Must first send response before sending data')
@@ -45,3 +55,8 @@ class HTTPResponse:
         else:
             self._handler.wfile.write(bytes(data.encode('utf-8')))
             return True
+
+    def __iadd__(self, data):
+        self.write(data)
+
+        return self

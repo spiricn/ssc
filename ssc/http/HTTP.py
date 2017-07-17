@@ -7,6 +7,7 @@ MIME_IMAGE_PNG = 'image/png'
 MIME_JSON = 'application/json'
 MIME_BINARY = 'application/octet-stream'
 MIME_SVG = 'image/svg+xml'
+MIME_XML = 'text/xml'
 
 HDR_CONTENT_TYPE = 'Content-type'
 HDR_CONTENT_LENGTH = 'Content-length'
@@ -14,6 +15,7 @@ HDR_ACCEPT = 'Accept'
 HDR_USER_AGENT = 'User-Agent'
 HDR_TRANSFER_ENCODING = 'Transfer-Encoding'
 HDR_CONNECTION = 'Connection'
+HDR_LOCATION = 'Location'
 
 TRANSFER_ENCODING_CHUNKED = 'chunked'
 
@@ -25,6 +27,7 @@ CODE_BAD_REQUEST = 400
 CODE_NOT_FOUND = 404
 CODE_INTERNAL_SERVER_ERROR = 500
 CODE_NOT_IMPLEMENTED = 501
+CODE_REDIRECT = 301
 
 PROTOCOL_VERSION_1_0 = 'HTTP/1.0'
 PROTOCOL_VERSION_1_1 = 'HTTP/1.1'
