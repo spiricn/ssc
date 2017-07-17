@@ -3,6 +3,7 @@ from os.path import sys, os
 from time import sleep
 
 from ssc.http import HTTP
+from ssc.servlets.RestServlet import RestHandler
 from ssc.servlets.ServletContainer import ServletContainer
 
 
@@ -38,9 +39,9 @@ def main():
 
     container.addRestAPI()
 
-    container.rest.addHandler('sample', sampleRest, 'This is a sample help doc')
+    container.rest.addHandler(RestHandler('sample', sampleRest, 'This is a sample help doc', chunked=False))
 
-    container.rest.addHandler('stream', streamRest, 'This is a stream help doc', chunked=True)
+    container.rest.addHandler(RestHandler('stream', streamRest, 'This is a stream help doc', chunked=True))
 
     logger.debug('sample started')
     logger.debug('Try accessing http://localhost:8080/rest/sample from your browser for a simple REST call')

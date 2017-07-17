@@ -1,4 +1,4 @@
-from ss.server.HTTP import HDR_CONNECTION, CONNECTION_CLOSE
+from ssc.http.HTTP import HDR_CONNECTION, CONNECTION_CLOSE
 
 
 class HTTPResponse:
