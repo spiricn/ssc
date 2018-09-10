@@ -1,15 +1,17 @@
 import logging
 import os
+import sys
+import traceback
 
-from ssc.http.HTTP import CODE_NOT_FOUND
+from ssc.http.HTTP import CODE_NOT_FOUND, CODE_INTERNAL_SERVER_ERROR
 from ssc.http.ThreadedHTTPServer import ThreadedHTTPServer
 from ssc.manifest.ManifestManager import ManifestManager
 from ssc.servlets.FileServlet import FileServlet
 from ssc.servlets.PageServlet import PageServlet
 from ssc.servlets.RestServlet import RestServlet
 
-
 logger = logging.getLogger(__name__)
+
 
 class ServletContainer:
     '''
@@ -48,7 +50,6 @@ class ServletContainer:
         self._restServlet = None
 
         logger.debug('Servlet container initialized:\n Root: %r\n Tmp: %r' % (self._directoryPath, self._tempDir))
-
 
     def start(self):
         return self._server.start()
@@ -205,10 +206,20 @@ class ServletContainer:
         else:
             return page404Servlet.handleRequest(request, response)
 
+    def handle500(self, request, response):
+        response.sendResponse(CODE_INTERNAL_SERVER_ERROR)
+        response.write('<html><head>500</head><body>Internal server error</body></html>')
+
+        return True
+
     def handleRequest(self, request, response):
         servlet = self._getServlet(request)
         if servlet:
-            if servlet.handleRequest(request, response):
+            try:
+                if servlet.handleRequest(request, response):
+                    return True
+            except Exception:
+                logger.error('Exception occurred while handling servlet: %s' % traceback.format_exc())
                 return True
 
         return self.handle404(request, response)
