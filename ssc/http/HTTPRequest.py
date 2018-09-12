@@ -1,5 +1,8 @@
 from urllib.parse import urlparse, parse_qs
 
+from ssc.http.HTTP import HDR_CONTENT_LENGTH
+
+
 class HTTPRequest:
     GET, \
     POST = range(2)
@@ -12,6 +15,14 @@ class HTTPRequest:
         self._type = HTTPRequest.GET
 
         self._params = parse_qs(self._url.query)
+
+    def read(self):
+        if not HDR_CONTENT_LENGTH in self.headers:
+            return None
+
+        contentLength = int(self._handler.headers[HDR_CONTENT_LENGTH])
+
+        return self._handler.rfile.read(contentLength)
 
     @property
     def headers(self):
