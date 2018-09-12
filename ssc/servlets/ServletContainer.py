@@ -137,6 +137,13 @@ class ServletContainer:
 
         self._servlets.append(servlet)
 
+    def insertServlet(self, index, servlet):
+        self._servlets.insert(index, servlet)
+
+    @property
+    def servlets(self):
+        return [i for i in self._servlets]
+
     def addServlet(self, servlet):
         self._servlets.append(servlet)
 
@@ -170,26 +177,19 @@ class ServletContainer:
             logger.error('Error unloading servlet %r: %r' % (manifestEntry.filePath, str(e)))
 
     def _getServlet(self, request):
-        if request.url.path == '/':
-            pageHomeServlet = self._findServlet(self._manifestManager.pageHome)
-
-            if not pageHomeServlet:
-                logger.error('Could not find home page servlet: %r' % self._manifestManager.pageHome)
-
-            else:
-                return pageHomeServlet
+        servlets = []
 
         for servlet in self._servlets:
             if not servlet.regex:
                 continue
 
             if servlet.regex.match(request.url.path):
-                return servlet
+                servlets.append(servlet)
 
         if os.path.isfile(os.path.join(self._directoryPath, request.url.path[1:])):
-            return self._fileServlet
+            servlets.append(self._fileServlet)
 
-        return None
+        return servlets
 
     def handle404(self, request, response):
         page404Servlet = self._findServlet(self._manifestManager.page404)
@@ -212,8 +212,9 @@ class ServletContainer:
         return True
 
     def handleRequest(self, request, response):
-        servlet = self._getServlet(request)
-        if servlet:
+        servlets = self._getServlet(request)
+
+        for servlet in servlets:
             try:
                 if servlet.handleRequest(request, response):
                     return True

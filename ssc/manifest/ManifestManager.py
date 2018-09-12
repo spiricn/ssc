@@ -11,7 +11,6 @@ class ManifestManager:
 
     PAGES_KEY_NAME = 'pages'
     PAGE_404_KEY_NAME = '404_page'
-    PAGE_HOME_KEY_NAME = 'home_page'
     PAGE_FILE_KEY_NAME = 'file'
     PAGE_PATTERN_KEY_NAME = 'pattern'
 
@@ -38,7 +37,6 @@ class ManifestManager:
         self._manfiestWatch.start()
 
         self._page404 = None
-        self._pageHome = None
         self._favIco = None
 
         # Run initial parse
@@ -113,10 +111,6 @@ class ManifestManager:
         if not self._page404:
             logger.warning('page 404 not found')
 
-        self._pageHome = manifest[ManifestManager.PAGE_HOME_KEY_NAME] if ManifestManager.PAGE_HOME_KEY_NAME in manifest else None
-        if not self._pageHome:
-            logger.warning('home page not found')
-
         logger.debug('Manifest processed')
 
         if self._onManifestUpdated:
@@ -156,7 +150,3 @@ class ManifestManager:
     @property
     def page404(self):
         return self._page404
-
-    @property
-    def pageHome(self):
-        return self._pageHome
