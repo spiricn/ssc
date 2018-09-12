@@ -24,7 +24,7 @@ class PageEntry(object):
 
     def __eq__(self, other):
         if isinstance(other, PageEntry):
-            return self._pattern == other._pattern and self._file == other._file
+            return self._pattern == other._pattern and self._filePath == other._file
         else:
             return False
 
@@ -32,4 +32,4 @@ class PageEntry(object):
         return not (self == other)
 
     def __str__(self):
-        return '{ManifestEntry: file=%r ; pattern=%r }' % (self._file, self._pattern)
+        return '{ManifestEntry: file=%r ; pattern=%r }' % (self._filePath, self._pattern)

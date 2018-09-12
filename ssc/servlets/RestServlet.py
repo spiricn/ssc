@@ -64,7 +64,7 @@ class RestServlet(Servlet):
 
         for handler in self._handlers:
             if handler.path == path:
-                code, mime, res = handler.callback(**request.params)
+                code, mime, res = handler.callback(request)
                 response.sendResponse(code)
                 response.sendHeader(HDR_CONTENT_TYPE, mime)
 
