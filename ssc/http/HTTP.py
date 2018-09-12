@@ -16,6 +16,8 @@ HDR_USER_AGENT = 'User-Agent'
 HDR_TRANSFER_ENCODING = 'Transfer-Encoding'
 HDR_CONNECTION = 'Connection'
 HDR_LOCATION = 'Location'
+HDR_SET_COOKIE = 'Set-Cookie'
+HDR_COOKIE = 'Cookie'
 
 TRANSFER_ENCODING_CHUNKED = 'chunked'
 

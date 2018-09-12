@@ -2,11 +2,19 @@ from ssc.http.HTTP import HDR_CONNECTION, CONNECTION_CLOSE
 
 
 class HTTPResponse:
+
     def __init__(self, handler):
         self._handler = handler
 
         self._responseSent = False
         self._headersSent = False
+        self._headers = {}
+
+    def addHeader(self, key, value):
+        if self._headersSent:
+            raise RuntimeError('Attempting to send header after sending data')
+
+        self._headers[key] = value
 
     def sendResponse(self, code):
         if self._responseSent:
@@ -17,6 +25,9 @@ class HTTPResponse:
         self._responseSent = True
 
         self.sendHeader(HDR_CONNECTION, CONNECTION_CLOSE)
+
+        for key, value in self._headers.items():
+            self.sendHeader(key, value)
 
     def flush(self):
         self._handler.wfile.flush()

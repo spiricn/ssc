@@ -1,6 +1,5 @@
 import logging
 import os
-import sys
 import traceback
 
 from ssc.http.HTTP import CODE_NOT_FOUND, CODE_INTERNAL_SERVER_ERROR
