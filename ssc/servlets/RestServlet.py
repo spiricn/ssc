@@ -11,7 +11,7 @@ from ssc.servlets.Servlet import Servlet
 logger = logging.getLogger(__name__)
 
 RestHandler = namedtuple('RestHandler', 'path, callback, help, chunked')
-RestHandler.__new__.__defaults__ = (None,) * len(RestHandler._fields)
+RestHandler.__new__.__defaults__ = (None, None, '', False)
 
 class RestServlet(Servlet):
     def __init__(self, servletContainer, pattern):
@@ -34,6 +34,10 @@ class RestServlet(Servlet):
 
     @classmethod
     def objToJson(cls, obj):
+        '''
+        Serialize object to JSON
+        '''
+
         if isinstance(obj, tuple):
             return cls.objToJson(obj._asdict())
         elif isinstance(obj, OrderedDict):
@@ -44,6 +48,8 @@ class RestServlet(Servlet):
             return cls.objToJson(obj._asdict())
         elif isinstance(obj, dict):
             return json.dumps(obj)
+        elif obj == None:
+            return ''
         else:
             return str(obj)
 
@@ -91,7 +97,7 @@ class RestServlet(Servlet):
 
         return True
 
-    def _apiDisplay(self):
+    def _apiDisplay(self, request):
         res = []
 
         for handler in self._handlers:
